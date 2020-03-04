@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 '''
 SAT Solver description ..
 '''
@@ -8,5 +8,9 @@ import sys
 import random
 import os
 
+
 #Main
-if __name__ == '__main__':
+if __name__ == "__main__":
+
+    
+

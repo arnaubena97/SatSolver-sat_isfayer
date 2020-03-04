@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 '''
-Copyright 2013 Josep Argelich
+Copyright 2020 Josep Argelich
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class Clause():
             new_lit = random.randint(1, num_vars) # New random variable
             if new_lit not in self.lits: #If the variable is not already in the clause
                 self.lits.append(new_lit) # Add it to the clause
-        for i in xrange(len(self.lits)): # Sets a negative sense with a 50% probability
+        for i in range(len(self.lits)): # Sets a negative sense with a 50% probability
             if random.random() < 0.5:
                 self.lits[i] *= -1 # Change the sense of the literal
 
@@ -74,7 +74,7 @@ class CNF():
     def gen_random_clauses(self):
         """Generate random clauses"""
         self.clauses = []
-        for i in xrange(self.num_clauses):
+        for i in range(self.num_clauses):
             c = Clause(self.num_vars, self.clause_length)
             self.clauses.append(c)
 
