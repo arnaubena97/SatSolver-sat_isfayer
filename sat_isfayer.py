@@ -7,9 +7,8 @@ SAT Solver description ..
 import sys
 import random
 import os
-from itertools import product
 
-MAX_TRIES = 1000000
+MAX_TRIES = 10000
 
 
 class cnf_formula(object):
@@ -43,9 +42,6 @@ class cnf_formula(object):
         print(self.clauses)
                 
 
-def combi(var):
-    return list(product(*((x, -x) for x in var)))
-
 
 class solver():
     def __init__(self, file_name=""):
@@ -54,17 +50,35 @@ class solver():
         self.best_cost = None
 
     def all_combinations(self):
-        random_solution = self.randomSolution(self.formula.num_variables)
-        satisfiable=0
+        #random_solution = self.randomSolution(self.formula.num_variables)
+        
         for _ in range(MAX_TRIES):
-            for var in random_solution:
-                for clause in self.formula.clauses:
+            satisfiable=0
+            
+            random_solution = self.randomSolution(self.formula.num_variables)
+            print ("RANDOMMMMM " ,random_solution)
+            aux_clauses = self.copy(self.formula.clauses)
+            print ("AUXXXXXX" ,aux_clauses)
+            flag = False
+            for clause in aux_clauses:
+                count_fail = 0
+                for var in random_solution:
                     #print (clause, var)
                     if var in clause:
-                        self.formula.clauses.remove(clause)
+                        #aux_clauses.remove(clause)
                         satisfiable += 1
-                    if satisfiable == self.formula.num_clauses:
-                        self.print_solution(random_solution)
+                        print(var, clause, satisfiable)
+                        if satisfiable == self.formula.num_clauses:
+                            self.print_solution(random_solution)
+                        break
+                    else:
+                        count_fail+=1
+                        if count_fail == self.formula.num_variables:
+                            flag = True
+                        print("HOLA",var, clause, satisfiable)    
+                if flag:
+                    break
+                    
         print("No solution found")
 
     def print_solution(self, solution):
@@ -78,6 +92,11 @@ class solver():
             if random.random() < 0.5:
                 random_solution[var] *= -1
         return random_solution
+
+    def copy(self, list):
+        """Copy the values of this instance of the class Interpretation to another instance"""
+        c = [x for x in list]
+        return c
 
 #Main
 
