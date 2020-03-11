@@ -1,15 +1,12 @@
-#!/usr/bin/python3
 '''
 SAT Solver description ..
 '''
 #Libraries
-
 import sys
 import random
 import os
-
+import time
 MAX_TRIES = 10000
-
 
 class cnf_formula(object):
     """Class to read and his methods """
@@ -40,8 +37,6 @@ class cnf_formula(object):
         print(self.num_clauses)
         print(self.num_variables)
         print(self.clauses)
-                
-
 
 class solver():
     def __init__(self, file_name=""):
@@ -65,7 +60,6 @@ class solver():
                     if var in clause:
                         #aux_clauses.remove(clause)
                         satisfiable += 1
-                        print(var, clause, satisfiable)
                         if satisfiable == self.formula.num_clauses:
                             self.print_solution(random_solution)
                         break
@@ -80,7 +74,7 @@ class solver():
 
     def print_solution(self, solution):
         print("s SATISFIABLE")
-        print("v %s 0"  %" "+str(solution))
+        print("v %s 0"  %" ".join(map(str, solution)))
         exit(0)
 
     def randomSolution(self, num_variables):
@@ -96,18 +90,15 @@ class solver():
         return c
 
 #Main
-
 if __name__ == "__main__":
-
     if len(sys.argv) == 2:
         file_name = sys.argv[1]
     else:
         print("\n Command: python %s <file_name.cnf> \n" %sys.argv[0])
         exit(0)
 
+    inici = time.time()
     solve = solver(file_name)
     solve.all_combinations()
-
-
-
-
+    final = time.time()
+    print("TEMPS D'EXECUCIÓ" + str(final - inici))
