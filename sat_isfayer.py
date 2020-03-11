@@ -34,7 +34,7 @@ class cnf_formula(object):
                     self.num_variables = int(line.split(' ')[2]) # set num_variables
                     self.num_clauses = int(line[:-1].split(' ')[3]) # set num_clauses
                     continue
-                self.clauses.append(map(int, line[:-3].split(' '))) # set clauses
+                self.clauses.append(list(map(int, line[:-3].split(' ')))) # set clauses
 
     def print_cnf(self):
         print(self.num_clauses)
@@ -56,9 +56,7 @@ class solver():
             satisfiable=0
             
             random_solution = self.randomSolution(self.formula.num_variables)
-            print ("RANDOMMMMM " ,random_solution)
             aux_clauses = self.copy(self.formula.clauses)
-            print ("AUXXXXXX" ,aux_clauses)
             flag = False
             for clause in aux_clauses:
                 count_fail = 0
@@ -75,7 +73,6 @@ class solver():
                         count_fail+=1
                         if count_fail == self.formula.num_variables:
                             flag = True
-                        print("HOLA",var, clause, satisfiable)    
                 if flag:
                     break
                     
@@ -83,7 +80,7 @@ class solver():
 
     def print_solution(self, solution):
         print("s SATISFIABLE")
-        print("v %s 0"  %" ".join(map(str, solution)))
+        print("v %s 0"  %" "+str(solution))
         exit(0)
 
     def randomSolution(self, num_variables):
