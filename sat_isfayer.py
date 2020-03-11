@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 '''
 SAT Solver description ..
 '''
@@ -12,11 +11,11 @@ import time
 MAX_TRIES = 100000
 
 
-class parser_file(object):
-    """Class to read and his methods """
+class read_file(object):
+    """Class to read and parse the file of CNF formula """
 
     def __init__(self, file_name=""):
-        """Constructor of the cnf_formula class"""
+        """Constructor of the read class"""
         self.num_variables = 0
         self.num_clauses = 0
         self.clauses = []
@@ -27,7 +26,7 @@ class parser_file(object):
             exit(1)
     
     def read_file(self, file_name):
-        """file reader and parser to store in the variables of the class"""
+        """file reader and parser the num of variables, num of clauses and put the clauses in a list"""
         with open(file_name) as all_file:
             for line in all_file:
                 if line.startswith('c'): continue #ignore comments
@@ -35,84 +34,55 @@ class parser_file(object):
                     self.num_variables = int(line.split(' ')[2]) # set num_variables
                     self.num_clauses = int(line[:-1].split(' ')[3]) # set num_clauses
                     continue
-                self.clauses.append(map(int, line[:-3].split(' '))) # set clauses
+                self.clauses.append(list(map(int, line[:-3].split(' ')))) # set clauses
 
     def print_cnf(self):
+        """Print all variables of read_file class"""
         print(self.num_clauses)
         print(self.num_variables)
         print(self.clauses)
                 
 
-
 class solver():
-    def __init__(self, file_name=""):
-        self.formula = parser_file(file_name)
+    def __init__(self, data):
+        self.data = data
         self.best_satisfa = 0
         self.best_solution = None
 
-    def all_combinations(self):
-        
-        for _ in range(MAX_TRIES):
-            satisfiable=0
-            random_solution = interpretations(self.formula.num_variables)
-            aux_clauses = self.copy(self.formula.clauses)
-            flag = False
-            for clause in aux_clauses:
-                count_fail = 0
-                for var in random_solution.candidate:
-                    if var in clause:
-                        #aux_clauses.remove(clause)
-                        satisfiable += 1
-                        #print(var, clause, satisfiable)
-                        if satisfiable == self.formula.num_clauses:
-                            return random_solution
-                        break
-                    else:
-                        count_fail+=1
-                        if count_fail == self.formula.num_variables: flag = True 
-                if flag: break
-                    
-        print("No solution found")
-
-
-    def copy(self, list):
-        """Copy the values of this instance of the class Interpretation to another instance"""
-        c = [x for x in list]
-        return c
-
     def new_solve(self, max_restarts = 10, max_tries= 100, random_condition = 0.03):
         for _ in range(max_restarts):
-            possible_solution = interpretations(self.formula.num_variables)
+            possible_solution = interpretations(self.data.num_variables)
             for _ in range(max_tries):
                 if random.random() < random_condition:
                     possible_solution = possible_solution.get_random_walk()
-
                 else:
-                    possible_solution = possible_solution.get_best_child(self.formula.clauses)
+                    possible_solution = possible_solution.get_best_child(self.data.clauses)
     
-                if possible_solution.satisfiables(self.formula.clauses) > self.best_satisfa:
+                if possible_solution.satisfiables(self.data.clauses) > self.best_satisfa:
                     self.best_solution = possible_solution.copyClass()
-                    self.best_satisfa = possible_solution.satisfiables(self.formula.clauses)
-                    if self.best_satisfa == self.formula.num_clauses: 
+                    self.best_satisfa = possible_solution.satisfiables(self.data.clauses)
+                    if self.best_satisfa == self.data.num_clauses: 
                         return self.best_solution, self.best_satisfa
         return self.best_solution, self.best_satisfa
 
-
-
 class interpretations():
+
     def __init__(self, N):
+        """Constructor of interpretation. Need one parameter, N is the number of variables
+            of the cnf formula"""
         self.num_variables = N
         self.candidate = self.randomSolution(N)
 
-
     def randomSolution(self, num_variables):
+        """Create a random solution of cnf formula. Ex: [-1, 2, 3, -4, ...]"""
         random_solution = [x for x in range(1, num_variables + 1)]
         for var in range(len(random_solution)):
             if random.random() < 0.5:
-                random_solution[var] *= -1
+                random_solution[var] = -random_solution[var]
         return random_solution
 
     def satisfiables(self, clauses):
+        """Returns the number of clauses satisfiables"""
         num_satisfa = 0
         flag = False
         for clause in clauses:
@@ -131,15 +101,16 @@ class interpretations():
         return num_satisfa
                 
     def print_solution(self):
+        """Method to print the solution that satisfies the """
         print("s SATISFIABLE")
         print("v %s 0"  %" ".join(map(str, self.candidate)))
             
     def get_childs(self):
         childs = []
-        for i in range(self.num_variables):
+        for _ in range(self.num_variables):
             new_child = self.copyClass()
             value = random.randint(0, self.num_variables - 2)
-            new_child.candidate[value] = -1 * new_child.candidate[value]
+            new_child.candidate[value] = -new_child.candidate[value]
             childs.append(new_child)
         return childs
 
@@ -148,6 +119,7 @@ class interpretations():
         return childs[random.randint(0, len(childs) -1)]
 
     def copyClass(self):
+        """Method to copy the class, not the reference"""
 
         c = interpretations(self.num_variables)
         c.candidate = [x for x in self.candidate]
@@ -166,7 +138,7 @@ class interpretations():
 #Main
 
 if __name__ == "__main__":
-
+    temps_inici = time.time()
     if len(sys.argv) == 2:
         file_name = sys.argv[1]
     else:
@@ -174,20 +146,12 @@ if __name__ == "__main__":
         exit(0)
 
 
-    # temps_inici = time.time()
-    # solve = solver(file_name)
-    # solution = solve.all_combinations()
-    # temps_final= time.time()
-    # solution.print_solution()
-    # print("temps:" + str(temps_final- temps_inici))
-    
-
-    temps_inici = time.time()
-    solve = solver(file_name)
+    data= read_file(file_name)
+    solve = solver(data)
     solution, cost = solve.new_solve()
-    temps_final= time.time()
     solution.print_solution()
-    print(str(cost) + "   temps:" + str(temps_final- temps_inici))
+    temps_final = time.time()
+    print(str(cost) + "   temps: " + str(temps_final- temps_inici))
     exit(0)
 
 
