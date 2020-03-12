@@ -8,9 +8,6 @@ import random
 import os
 import time
 
-MAX_TRIES = 100000
-
-
 class read_file(object):
     """Class to read and parse the file of CNF formula """
 
@@ -42,7 +39,6 @@ class read_file(object):
         print(self.num_variables)
         print(self.clauses)
                 
-
 class solver():
     def __init__(self, data):
         self.data = data
@@ -72,6 +68,7 @@ class interpretations():
             of the cnf formula"""
         self.num_variables = N
         self.candidate = self.randomSolution(N)
+        self.all_satisfa = []
 
     def randomSolution(self, num_variables):
         """Create a random solution of cnf formula. Ex: [-1, 2, 3, -4, ...]"""
@@ -153,7 +150,6 @@ if __name__ == "__main__":
     temps_final = time.time()
     print(str(cost) + "   temps: " + str(temps_final- temps_inici))
     exit(0)
-
 
 
 
