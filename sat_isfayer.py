@@ -38,99 +38,93 @@ class read_file(object):
         print(self.num_clauses)
         print(self.num_variables)
         print(self.clauses)
-                
-class solver():
+
+
+class solver_walksat():
     def __init__(self, data):
-        self.data = data
-        self.best_satisfa = 0
-        self.best_solution = None
-
-    def new_solve(self, max_restarts = 10, max_tries= 100, random_condition = 0.03):
-        for _ in range(max_restarts):
-            possible_solution = interpretations(self.data.num_variables)
-            for _ in range(max_tries):
-                if random.random() < random_condition:
-                    possible_solution = possible_solution.get_random_walk()
-                else:
-                    possible_solution = possible_solution.get_best_child(self.data.clauses)
+        self.clauses = data.clauses
+        self.num_variables = data.num_variables
+        self.best_cost = 0
+        self.index_costs = []
+        self.formula = []
+        self.clauses_not_sat = []
+        #self.vars_positions = self.create_positions()
     
-                if possible_solution.satisfiables(self.data.clauses) > self.best_satisfa:
-                    self.best_solution = possible_solution.copyClass()
-                    self.best_satisfa = possible_solution.satisfiables(self.data.clauses)
-                    if self.best_satisfa == self.data.num_clauses: 
-                        return self.best_solution, self.best_satisfa
-        return self.best_solution, self.best_satisfa
+    def solve(self, max_tries = 20, max_flips=200):
 
-class interpretations():
+        for _ in range(max_tries):
+            self.formula = self.randomSolution()
+            for _ in range(max_flips):
+                self.index_costs = self.calculateIndexCosts()
 
-    def __init__(self, N):
-        """Constructor of interpretation. Need one parameter, N is the number of variables
-            of the cnf formula"""
-        self.num_variables = N
-        self.candidate = self.randomSolution(N)
-        self.all_satisfa = []
+                if 0 not in self.index_costs:
+                    print_sol(self.formula)
+                    return
+                self.best_change()
 
-    def randomSolution(self, num_variables):
+    def best_change(self):
+        vars_not_sat = []
+        best_cost = len(self.clauses) +2
+        new_formula = self.formula.copy()
+        best_formula=[]
+
+        for index, cost in enumerate(self.index_costs):
+            if cost == 0:
+                clause = self.clauses[index].copy()
+                for var in clause:
+                    vars_not_sat.append(var)
+
+        for variable in vars_not_sat:
+            new_formula = self.formula.copy()
+            new_formula[abs(variable) -1] = variable
+            list_costs = self.calculateIndexCosts()
+            cost = self.count_zero(list_costs)
+            if best_cost > cost:
+                best_formula = new_formula.copy()
+                best_cost = cost
+        self.formula = best_formula.copy()
+        return
+
+    def create_positions(self):
+        vars_positions = [[]] * (self.num_variables*2 +1)
+        for index, clause in enumerate(self.clauses):
+            for var in clause:
+                aux_list = []
+                aux_list = vars_positions[var].copy()
+                aux_list.append(index)
+                vars_positions[var] = aux_list.copy()
+        return vars_positions
+
+    def count_zero(self, costs):
+        count = 0
+        for value in costs:
+            if value == 0:
+                count +=1
+        return count
+ 
+    def randomSolution(self):
         """Create a random solution of cnf formula. Ex: [-1, 2, 3, -4, ...]"""
-        random_solution = [x for x in range(1, num_variables + 1)]
+        random_solution = [x for x in range(1, self.num_variables + 1)]
         for var in range(len(random_solution)):
             if random.random() < 0.5:
                 random_solution[var] = -random_solution[var]
         return random_solution
 
-    def satisfiables(self, clauses):
-        """Returns the number of clauses satisfiables"""
-        num_satisfa = 0
-        flag = False
-        for clause in clauses:
-            count_fail = 0
-            for var in self.candidate:
-                if var in clause:
-                    num_satisfa += 1
-                    if num_satisfa == len(clauses):
-                        return num_satisfa
-                    break
-                else:
-                    count_fail+=1
-                    if count_fail == self.num_variables: flag = True 
-            if flag: break
+    def calculateIndexCosts(self):
+        index_sat = []
+        for clause in self.clauses:
+            number_sat = 0
+            for variable in self.formula:
+                if variable in clause:
+                    number_sat +=1
+            index_sat.append(number_sat)
+        return index_sat
 
-        return num_satisfa
-                
-    def print_solution(self):
+def print_sol(solution):
         """Method to print the solution that satisfies the """
         print("s SATISFIABLE")
-        print("v %s 0"  %" ".join(map(str, self.candidate)))
-            
-    def get_childs(self):
-        childs = []
-        for _ in range(self.num_variables):
-            new_child = self.copyClass()
-            value = random.randint(0, self.num_variables - 2)
-            new_child.candidate[value] = -new_child.candidate[value]
-            childs.append(new_child)
-        return childs
-
-    def get_random_walk(self):
-        childs = self.get_childs()
-        return childs[random.randint(0, len(childs) -1)]
-
-    def copyClass(self):
-        """Method to copy the class, not the reference"""
-
-        c = interpretations(self.num_variables)
-        c.candidate = [x for x in self.candidate]
-        return c
-
-    def get_best_child(self, clauses):
-        childs = self.get_childs()
-        best_child = 0
-        best_cost = 0
-        for num_child, child in enumerate(childs):
-            if child.satisfiables(clauses) >= best_cost:
-                best_child = num_child
-                best_cost = child.satisfiables(clauses)
-        return childs[best_child]
+        print("v %s 0"  %" ".join(map(str, solution)))
+        exit(0)
 
 #Main
 
@@ -142,15 +136,8 @@ if __name__ == "__main__":
         print("\n Command: python %s <file_name.cnf> \n" %sys.argv[0])
         exit(0)
 
-
     data= read_file(file_name)
-    solve = solver(data)
-    solution, cost = solve.new_solve()
-    solution.print_solution()
-    temps_final = time.time()
-    print(str(cost) + "   temps: " + str(temps_final- temps_inici))
-    exit(0)
-
-
+    solver = solver_walksat(data)
+    solver.solve()
 
 
