@@ -3,8 +3,8 @@
 ## Table of contents
 * [General info](#general-info)
 * [Requirements](#Requirements)
-* [Generate formula](#Generate formula)
-* [Run solver](#Run solver)
+* [Generate formula](#Generate-formula)
+* [Run solver](#Run-solver)
 
 ## General info
 
