@@ -1,7 +1,3 @@
-'''
-SAT Solver description ..
-'''
-#Libraries
 
 import sys
 import random
@@ -49,7 +45,7 @@ class solver_walksat():
         self.formula = []
         self.vars_positions = []
     
-    def solve(self, max_tries = 50, max_flips=1000):
+    def solve(self, max_tries = 70, max_flips=800):
         """Solver based in walksat"""
         for _ in range(max_tries):
             self.formula = self.randomSolution()
