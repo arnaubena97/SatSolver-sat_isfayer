@@ -103,9 +103,10 @@ class walksat_solver():
 
         return random.choice(bests_variables)
 
-    def solve(self, max_tries=50, max_flips=3000):
+    def solve(self, max_tries=50000000, max_flips=3000):
         """Implementation of the solver"""
-        for _ in range(max_tries):
+        #for _ in range(max_tries):
+        while(True):
             self.formula = self.randomSolution()
             self.index_clauses_satisfied = self.calculate_all_clauses_satisfy()
             for _ in range(max_flips):
