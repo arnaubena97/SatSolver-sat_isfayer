@@ -9,9 +9,14 @@ def read_file(file_name):
         for line in all_file:
             if line.startswith('c'): continue #ignore comments
             if line.startswith('p'):
-                num_variables = int(line.split(' ')[2]) # set num_variables
+                num_variables = int(line.split()[2]) # set num_variables
                 continue
-            clauses.append(list(map(int, line[:-3].split(' ')))) # set clauses
+            if line.strip() == "": continue
+
+            clause = list(map(int, line.split()))
+            clause.pop()
+            clauses.append(clause)
+
     return num_variables, clauses
 
 def print_sol(solution):
