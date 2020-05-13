@@ -12,6 +12,8 @@
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.bench_local_race
+.idea
 
 # Generated files
 .idea/**/contentModel.xml
