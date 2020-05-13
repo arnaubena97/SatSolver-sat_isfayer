@@ -16,7 +16,11 @@
 Project based on developing a partial and complete SAT Solver.
 These two SAT Solver are two assignments of the Advanced IA subject
 
-##Partial SAT Solver
+## Requirements
+Project is created with:
+* Python 3.6
+
+## Partial SAT Solver
 
 The partial SAT Solver is based on Walk SAT which is a local search algorithm.
  This is able to know if there is an interpretation that satisfies the formula 
@@ -30,7 +34,7 @@ $ python3.6 sat_isfayer <name_test.cnf>
 
 You can see our implementation in the local_search folder or click [hear](https://github.com/arnaubena97/sat_isfayer/tree/master/local_search)
 
-##Complete SAT Solver
+## Complete SAT Solver
 
 The complete SAT Solver are based in DPLL SAT.(update information)
 
@@ -42,9 +46,6 @@ $ python3.6 sat_isfayer_pro <name_test.cnf>
 
 You can see our implementation in the complete_search folder or click [hear](https://github.com/arnaubena97/sat_isfayer/tree/master/complete_search)
 
-## Requirements
-Project is created with:
-* Python 3.6
 
 ## Generate CNF formula
 
