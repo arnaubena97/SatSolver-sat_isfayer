@@ -14,7 +14,7 @@
 ## General info
 
 Project based on developing a partial and complete SAT Solver.
-These two SAT Solver are two assignments of the Advanced IA subject
+These two SAT Solver are two assignments of the Advanced IA subject in university of Lleida.
 
 ## Requirements
 Project is created with:
@@ -61,7 +61,7 @@ $ python rnd-cnf-gen.py <num-vars> <num-clauses> <clause-length> [<random-seed>]
 ```
 
 
-##Contributors
+## Contributors
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->
 <!-- markdownlint-disable -->
