@@ -3,6 +3,8 @@ import os
 import sys
 import random
 from collections import defaultdict
+sys.setrecursionlimit(10**9)
+
 
 
 def read_file(file_name):
@@ -23,6 +25,7 @@ def read_file(file_name):
 def print_solution(solution):
     """Method to print the solution that satisfies all the clauses or unsatisfiable """
     if solution:
+        #solution = sorted(solution, key=abs)
         print("s SATISFIABLE")
         print("v %s 0"  %" ".join(map(str, solution)))
         exit(0)
@@ -30,57 +33,81 @@ def print_solution(solution):
         print("s UNSATISFIABLE")
         exit(0)
 
-def heuristic_1(clauses):
+def select_var1(clauses):
     literal_weight = defaultdict(int)
     for clause in clauses:
         for literal in clause:
-            literal_weight[abs(literal)] += 2 ** -len(clause)
-    #print(max(literal_weight, key=literal_weight.get))
+            literal_weight[literal] += 2 ** -len(clause) #abs(literal)
     return max(literal_weight, key=literal_weight.get)
 
+def select_var2(clauses):
+    counter = defaultdict(int)
+    for clause in clauses:
+        for literal in clause:
+            if literal in counter:
+                counter[literal] += 2 ** -len(clause)
+            else:
+                counter[literal] = 2 ** -len(clause)
+    return max(counter, key=counter.get)
+
+
+def select_var3(clauses):
+    counter = defaultdict(int)
+    for clause in clauses:
+        for literal in clause:
+            if literal in counter:
+                counter[literal] += 1
+            else:
+                counter[literal] = 1
+    return max(counter, key=counter.get)
 
 def backtrack(clauses , interpretation):
-    clauses, var = assign_unit(clauses)
+    clauses, var = unit_prop(clauses)
     interpretation = interpretation + var
-    if clauses == -1:
+    if clauses == "C":
         return []
     if not clauses:
         return interpretation
-    best_var = heuristic_1(clauses)
-    res = backtrack(bcp(clauses, best_var), interpretation + [best_var])
-    # if no solution when assigning to True, try to assign to False
-    if not res:
-        res = backtrack(bcp(clauses, -best_var), interpretation + [-best_var])
-    return res
+    best_var =select_var2(clauses)
+    return (backtrack(delete_aparitions(clauses, best_var), interpretation +[best_var]) or backtrack(delete_aparitions(clauses, -best_var), interpretation + [-best_var]))
 
-def bcp(clauses, unit):
-    new_cnf = []
+
+def delete_aparitions(clauses, var):
+    aux_clauses= []
     for clause in clauses:
-        if unit in clause:
-            continue
-        if -unit in clause:
-            new_clause = [literal for literal in clause if literal != -unit]
-            if not new_clause:
-                return -1
-            new_cnf.append(new_clause)
-        else:
-            new_cnf.append(clause)
-    return new_cnf
+        if var not in clause:
+            if -var not in clause:
+                aux_clauses.append(clause)
+            else:
+                aux_clause = []
+                for aux_var in clause:
+                    if aux_var is not -var:
+                        aux_clause.append(aux_var)
+                if not aux_clause:
+                    return "C"
+                aux_clauses.append(aux_clause)
+    return aux_clauses
+
+def sel_lenght1(clauses):
+    aux_clauses = []
+    for clause in clauses:
+        if len(clause)==1:
+            aux_clauses.append(clause[0])
+    return aux_clauses
 
 # This implements the while loop of the BCP function
-def assign_unit(clauses):
-    interpretation= []  # contains the bool assignments for each variable
-    unit_clauses = [clause for clause in clauses if len(clause) == 1]
-    while unit_clauses:
-        unit = unit_clauses[0][0]
-        clauses = bcp(clauses, unit)  # assign true to unit
-        interpretation+= [unit]
-        if clauses == -1:
-            return -1, []
-        # base case: empty conjunct so it is SAT
-        if not clauses:
-            return clauses, interpretation
-        unit_clauses = [clause for clause in clauses if len(clause) == 1]  # update
+def unit_prop(clauses):
+    interpretation= []
+    clauses_len1 = sel_lenght1(clauses) #llista de clausules de llargada 1
+    while clauses_len1:
+        var = clauses_len1.pop() #per totes les clausules que estan soles...
+        clauses = delete_aparitions(clauses, var)
+        interpretation+= [var]
+        if clauses == "C":
+            return "C", []
+        if not clauses: #si ja no tenim mes clausules, retornem les clusules [] i la interpretacio
+            return [], interpretation
+        clauses_len1 = sel_lenght1(clauses)#mirem si hi ha alguna variable que hagi pugut quedar sola
     return clauses, interpretation
 
 def write_file(solution):
@@ -88,12 +115,8 @@ def write_file(solution):
     if solution:
         f.write("s SATISFIABLE\n")
         f.write(("v %s 0" % " ".join(map(str, solution))))
-
     else:
         f.write("s UNSATISFIABLE")
-
-
-
 
 #Main
 if __name__ == "__main__":
@@ -103,12 +126,13 @@ if __name__ == "__main__":
         print("\n Command: python %s <file_name.cnf> \n" %sys.argv[0])
         exit(0)
 
+    count = 0
     vars, clauses = read_file(file_name)
     solution = backtrack(clauses,[])
-    print_solution(solution)
+    #print_solution(solution)
 
-    #write_file(solution)
-    #command = "python3 comprove.py " + file_name + " " + "t.txt"
-    #os.system(command)
+    write_file(solution)
+    command = "python3 comprove.py " + file_name + " " + "t.txt"
+    os.system(command)
 
 
