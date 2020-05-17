@@ -3,7 +3,6 @@ import sys
 from collections import defaultdict
 sys.setrecursionlimit(10**9)
 
-
 def read_file(file_name):
     """File reader and parser the num of variables, num of clauses and put the clauses in a list"""
     clauses =[]
@@ -38,7 +37,7 @@ def select_var1(clauses):
     literal_weight = defaultdict(int)
     for clause in clauses:
         for literal in clause:
-            literal_weight[literal] += 2 ** -len(clause) #abs(literal)
+            literal_weight[literal] += 2 ** -len(clause)
     return max(literal_weight, key=literal_weight.get)
 
 def select_var2(clauses):
@@ -63,16 +62,16 @@ def select_var3(clauses):
                 counter[literal] = 1
     return max(counter, key=counter.get)
 
-def backtrack(clauses, interpretation):
+def backtrackk(clauses, interpretation = []):
     clauses, var = unit_prop(clauses)
     interpretation = interpretation + var
     if clauses == "conflict":
         return []
     if not clauses:
         return interpretation
-    best_var =select_var1(clauses)
-    return(backtrack(delete_aparitions(clauses, best_var), interpretation +[best_var])
-           or backtrack(delete_aparitions(clauses, -best_var), interpretation + [-best_var]))
+    best_var =select_var2(clauses)
+    return(backtrackk(delete_aparitions(clauses, best_var), interpretation +[best_var])
+           or backtrackk(delete_aparitions(clauses, -best_var), interpretation + [-best_var]))
 
 def delete_aparitions(clauses, variable):
     """delete apartitions of variable or -variable in clause"""
@@ -119,9 +118,8 @@ if __name__ == "__main__":
     else:
         print("\n Command: python %s <file_name.cnf> \n" %sys.argv[0])
         exit(0)
-
     vars, clauses = read_file(file_name)
-    solution = backtrack(clauses,[])
+    solution = backtrackk(clauses)
     print_solution(solution, vars)
 
 
