@@ -36,7 +36,7 @@ You can see our implementation in the local_search folder or click [hear](https:
 
 ## Complete SAT Solver
 
-The complete SAT Solver are based in DPLL SAT.(update information)
+The complete SAT Solver are based ina recursive DPLL SAT.
 
 To run this SAT Solver, execute the next command in the folder of the SAT:
 

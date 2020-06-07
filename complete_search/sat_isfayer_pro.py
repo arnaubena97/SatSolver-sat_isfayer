@@ -21,10 +21,10 @@ def read_file(file_name):
 def print_solution(solution, num_vars):
     """Method to print the solution that satisfies all the clauses or unsatisfiable """
     if solution:
-        aux_solution = [x for x in range(1, num_vars+1)]
+        aux_solution = [x for x in range(1, num_vars+1)]## to put all variables in interpretation
         for var in solution:
             if aux_solution[abs(var)-1] != var:
-                aux_solution[abs(var)-1] = var
+                    aux_solution[abs(var)-1] = var
         print("s SATISFIABLE")
         print("v %s 0"  %" ".join(map(str, aux_solution)))
         exit(0)
@@ -32,37 +32,27 @@ def print_solution(solution, num_vars):
         print("s UNSATISFIABLE")
         exit(0)
 
-def select_var1(clauses):
-    """heuristic1"""
-    literal_weight = defaultdict(int)
-    for clause in clauses:
-        for literal in clause:
-            literal_weight[literal] += 2 ** -len(clause)
-    return max(literal_weight, key=literal_weight.get)
-
 def select_var2(clauses):
     """heuristic2"""
     counter = defaultdict(int)
     for clause in clauses:
         for literal in clause:
-            if literal in counter:
-                counter[literal] += 2 ** -len(clause)
-            else:
-                counter[literal] = 2 ** -len(clause)
+            counter[literal] += 2 ** -len(clause)
     return max(counter, key=counter.get)
 
-def select_var3(clauses):
-    """heuristic3"""
+def select_var1(clauses):
+    """heuristic1"""
     counter = defaultdict(int)
     for clause in clauses:
         for literal in clause:
-            if literal in counter:
-                counter[literal] += 1
-            else:
-                counter[literal] = 1
+            counter[literal] += 1
     return max(counter, key=counter.get)
 
-def backtrackk(clauses, interpretation = []):
+def dpll(clauses, best_var=0, interpretation=[]):
+    """Function to explore all posibilities to find a solution"""
+    if best_var != 0:
+        clauses = delete_aparitions(clauses, best_var)
+        interpretation += [best_var]
     clauses, var = unit_prop(clauses)
     interpretation = interpretation + var
     if clauses == "conflict":
@@ -70,8 +60,8 @@ def backtrackk(clauses, interpretation = []):
     if not clauses:
         return interpretation
     best_var =select_var2(clauses)
-    return(backtrackk(delete_aparitions(clauses, best_var), interpretation +[best_var])
-           or backtrackk(delete_aparitions(clauses, -best_var), interpretation + [-best_var]))
+    return(dpll(clauses, best_var, interpretation) # branch variable
+           or dpll(clauses, -best_var, interpretation))# branch oposite variable
 
 def delete_aparitions(clauses, variable):
     """delete apartitions of variable or -variable in clause"""
@@ -82,7 +72,7 @@ def delete_aparitions(clauses, variable):
             for var in clause:
                 if var != -variable:
                     one_clause.append(var)
-            if one_clause == []:
+            if one_clause == []: # unsat
                 return "conflict"
             aux_clauses.append(one_clause)
         if variable not in clause and -variable not in clause:
@@ -98,17 +88,18 @@ def find_lenght1(clauses):
     return aux_clauses
 
 def unit_prop(clauses):
+    """put true the variables in clause 1 of length"""
     interpretation= []
-    clauses_len1 = find_lenght1(clauses) #llista de clausules de llargada 1
+    clauses_len1 = find_lenght1(clauses) #look if a variable is alone in clause
     while clauses_len1:
-        var = clauses_len1.pop() #per totes les clausules que estan soles...
+        var = clauses_len1.pop() #for all clauses that they are alone
         clauses = delete_aparitions(clauses, var)
         interpretation+= [var]
         if clauses == "conflict":
-            return "conflict", []
-        if not clauses: #si ja no tenim mes clausules, retornem les clusules [] i la interpretacio
+            return "conflict", [] #return conflict because can't be possible to asing it(UNSAT if they explore all)
+        if not clauses: #don't more clause, return [] and interpretation(SATISFIABLE)
             return [], interpretation
-        clauses_len1 = find_lenght1(clauses)#mirem si hi ha alguna variable que hagi pugut quedar sola
+        clauses_len1 = find_lenght1(clauses)#look if a variable is alone in clause for new iteration
     return clauses, interpretation
 
 #Main
@@ -119,8 +110,7 @@ if __name__ == "__main__":
         print("\n Command: python %s <file_name.cnf> \n" %sys.argv[0])
         exit(0)
     vars, clauses = read_file(file_name)
-    solution = backtrackk(clauses)
+    solution = dpll(clauses)
     print_solution(solution, vars)
-
 
 
