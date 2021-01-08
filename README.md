@@ -68,7 +68,7 @@ there is a file called *graph_colorng.py* and how say the name its function is t
  The cnf that use are in folder [bench_graph](https://github.com/arnaubena97/sat_isfayer/tree/master/bench_graph)
 
 An example of graph-coloring:
-![Example](https://en.wikipedia.org/wiki/File:Petersen_graph_3-coloring.svg)
+![Example](https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Petersen_graph_3-coloring.svg/1920px-Petersen_graph_3-coloring.svg.png)
 ```bash
 $ python graph_colorng.py <file_name.txt> <num-colors>
 ```
