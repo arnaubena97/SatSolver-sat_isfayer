@@ -60,6 +60,19 @@ They generates a correct CNF formula and prints it on terminal but if
 $ python rnd-cnf-gen.py <num-vars> <num-clauses> <clause-length> [<random-seed>]
 ```
 
+## Graph-Coloring
+
+In the folder [bench_sat](https://github.com/arnaubena97/sat_isfayer/tree/master/local_search) 
+there is a file called *graph_colorng.py* and how say the name its function is to coloring the vertices of
+ a graph such that no two adjacent vertices are of the same color.
+ The cnf that use are in folder [bench_graph](https://github.com/arnaubena97/sat_isfayer/tree/master/bench_graph)
+
+An example of graph-coloring:
+![Example](https://en.wikipedia.org/wiki/File:Petersen_graph_3-coloring.svg)
+```bash
+$ python graph_colorng.py <file_name.txt> <num-colors>
+```
+
 
 ## Contributors
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
